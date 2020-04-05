@@ -543,6 +543,7 @@ static void motion_detected(struct context *cnt, int dev, struct image_data *img
                 if (indx == cnt->imgs.image_ring_size) indx = 0;
                 if ((cnt->imgs.image_ring[indx].flags & (IMAGE_SAVE | IMAGE_SAVED)) == IMAGE_SAVE){
                     event(cnt, EVENT_FIRSTMOTION, img, NULL, NULL, &cnt->imgs.image_ring[indx].timestamp_tv);
+                    event(cnt, EVENT_START_VIDEO, NULL, NULL, NULL, &cnt->imgs.image_ring[indx].timestamp_tv);
                     indx = cnt->imgs.image_ring_in;
                 }
             } while (indx != cnt->imgs.image_ring_in);
@@ -2597,8 +2598,16 @@ static void mlp_actions(struct context *cnt){
      * First test for movie_max_time
      */
     if ((cnt->conf.movie_max_time && cnt->event_nr == cnt->prev_event) &&
-        (cnt->currenttime - cnt->eventtime >= cnt->conf.movie_max_time))
-        cnt->event_stop = TRUE;
+        (cnt->currenttime - cnt->eventtime >= cnt->conf.movie_max_time)) {
+        /* We refresh the eventtime to get a new movie of movie_max_time duration */
+        cnt->eventtime = cnt->currenttime;
+        event(cnt, EVENT_END_VIDEO, NULL, NULL, NULL, &cnt->current_image->timestamp_tv);
+
+        /* If there is motion during the current frame, we start another movie */
+        if(cnt->current_image->flags) {
+            event(cnt, EVENT_START_VIDEO, NULL, NULL, NULL, &cnt->current_image->timestamp_tv);
+        }
+    }
 
     /*
      * Now test for quiet longer than 'gap' OR make movie as decided in
@@ -2619,6 +2628,7 @@ static void mlp_actions(struct context *cnt){
                 cnt->imgs.preview_image.diffs = 0;
             }
 
+            event(cnt, EVENT_END_VIDEO, NULL, NULL, NULL, &cnt->current_image->timestamp_tv);
             event(cnt, EVENT_ENDMOTION, NULL, NULL, NULL, &cnt->current_image->timestamp_tv);
 
             /*

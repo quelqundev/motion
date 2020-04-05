@@ -33,6 +33,8 @@ typedef enum {
     EVENT_CAMERA_FOUND,
     EVENT_FFMPEG_PUT,
     EVENT_LAST,
+    EVENT_START_VIDEO,
+    EVENT_END_VIDEO,
 } motion_event;
 
 typedef void(* event_handler)(struct context *, motion_event, struct image_data *,

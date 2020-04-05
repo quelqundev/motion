@@ -50,7 +50,9 @@ const char *eventList[] = {
     "EVENT_CAMERA_LOST",
     "EVENT_CAMERA_FOUND",
     "EVENT_FFMPEG_PUT",
-    "EVENT_LAST"
+    "EVENT_LAST",
+    "EVENT_START_VIDEO",
+    "EVENT_END_VIDEO"
 };
 
 /**
@@ -1344,11 +1346,11 @@ struct event_handlers event_handlers[] = {
     event_stream_put
     },
     {
-    EVENT_FIRSTMOTION,
+    EVENT_START_VIDEO,
     event_new_video
     },
     {
-    EVENT_FIRSTMOTION,
+    EVENT_START_VIDEO,
     event_ffmpeg_newfile
     },
     {
@@ -1360,7 +1362,7 @@ struct event_handlers event_handlers[] = {
     event_ffmpeg_put
     },
     {
-    EVENT_ENDMOTION,
+    EVENT_END_VIDEO,
     event_ffmpeg_closefile
     },
     {
@@ -1382,7 +1384,7 @@ struct event_handlers event_handlers[] = {
     on_movie_end_command
     },
     {
-    EVENT_FIRSTMOTION,
+    EVENT_START_VIDEO,
     event_create_extpipe
     },
     {
@@ -1394,7 +1396,7 @@ struct event_handlers event_handlers[] = {
     event_extpipe_put
     },
     {
-    EVENT_ENDMOTION,
+    EVENT_END_VIDEO,
     event_extpipe_end
     },
     {
