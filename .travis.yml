@@ -105,6 +105,17 @@ script:
       ./configure && make check;
     elif [ "$DOCKER_IMAGE" = "alpine:latest" ]; then
       docker exec $(docker ps -aq) /bin/sh -c './configure && make check';
+    elif [ "$DOCKER_IMAGE" = "debian:buster" ]; then
+      docker exec $(docker ps -aq) /bin/bash -c './configure && make check';
+      docker exec $(docker ps -aq) /bin/bash -c 'chmod +x ./builddeb.sh && ./builddeb.sh myname myemail master n any && ls ./';
+      docker cp $(docker ps -aq):./pi* pi*
     elif [ "x$DOCKER_IMAGE" != "x" ]; then
       docker exec $(docker ps -aq) /bin/bash -c './configure && make check';
     fi;
+
+deploy:
+  provider: releases
+  api_key: "SECRET_TOKEN"
+  file: pi*
+  skip_cleanup: true
+  draft: true
